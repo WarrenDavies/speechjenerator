@@ -1,11 +1,8 @@
-from diffusers import StableDiffusionPipeline
-import torch
-from torch import autocast
 import time
 import datetime 
-from packagename.models.registry import register_model
+from speechjenerator.models.registry import register_model
 
-from packagename.core.base_class import BaseClass
+from speechjenerator.core.base_class import BaseClass
 
 
 @register_model("model_name")

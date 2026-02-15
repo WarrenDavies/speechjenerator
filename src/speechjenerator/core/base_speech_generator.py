@@ -9,13 +9,13 @@ from packagename.core.base_class_record import BaseClassRecord
 from packagename.config import config
 
 
-class BaseClass(ABC):
+class BaseSpeechGenerator(ABC):
     """
-    Abstract base class for...
+    Abstract base class for TTS.
 
     This class handles... 
     
-    Subclasses must implement...
+    Subclasses must implement create_pipeline() and run_pipeline()
 
     Attributes:
         config (dict): Configuration dictionary containing model parameters, paths, and settings.
@@ -31,7 +31,16 @@ class BaseClass(ABC):
                 - 
         """
         self.config = config
-        self.generation_record = BaseClassRecord()
+        self.pipe = None
+        self.response = None
+        self.dtype = None
+        self.device = None
+        self.DTYPES_MAP = {
+            "bfloat16": torch.bfloat16,
+            "float16": torch.float16,
+            "float32": torch.float32,
+        }
+        self.detect_device_and_dtype()
 
 
     def detect_device_and_dtype(self):
@@ -44,7 +53,7 @@ class BaseClass(ABC):
         else:
             self.device = self.config["device"]
 
-        self.set_dtype()
+        self.set_dtype()b
         
 
     def set_device(self):
@@ -94,97 +103,44 @@ class BaseClass(ABC):
         return random.randint(0, (2**size) - 1)
 
 
+    def merge_config(self, config):
+        merged_config = copy.deepcopy(self.config)
+        merged_config.update(config)
+
+        return merged_config
+
+
     @abstractmethod
-    def create_pipeline(self):
+    def load(self):
         """
         Abstract method to initialize the model pipeline.
         
-        Subclasses must implement this to load the specific model
-        and assign it to `self.pipe`.
+        Subclasses must implement this to load the specific model and tokenizer/pipeline object, assigning it to self.pipe (e.g., a Hugging Face Pipeline object).
         """
         pass
-
-
-    def run_pipeline(self):
-        """
-        Executes the pipeline implementation and tracks performance metrics.
-
-        Calculates run time and ... , updating
-        the `generation_record`.
-        """
-        start_time = time.time()
-        self.run_pipeline_impl()
-        end_time = time.time()
-        self.generation_record.total_generation_time = end_time - start_time
 
 
     @abstractmethod
-    def run_pipeline_impl(self):
+    def prepare(self):
         """
-        Abstract method containing the core generation logic.
-
-        Subclasses must implement this to call the model pipeline and populate `self.images`.
+        Reset lifecycle without tearing down the model - e.g., clear cache, etc.
         """
         pass
-    
 
-    def generate_(self):
+
+    def generate_impl(self):
         """
-        #### rename to generate_image, generate_text, generate_speeh... etc.
+        The public API that runs inference.
 
-        Main workflow method to generate and save images.
-
-        Steps:
-            1. Creates the pipeline.
-            2. Runs the pipeline implementation.
+        Returns:
+            GeneratorOutput        
         """
-        self.create_pipeline()
-        self.run_pipeline()
-        self.save()
-        if self.config["save_gen_stats"]:
-            self.save_gen_stats()
-
-
-    def save_(self):
-        """
-        #### rename to save_image, save_text, save_speeh... etc.
-
-        Saves generated XXXX to the configured directory with a timestamped filename.
-
-        """
-        self.save_timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        file_name = f"{self.save_timestamp}.png"
-        save_path = os.path.join(self.config["save_folder"], file_name)
-        output.save(save_path)
-
-
-    def complete_generation_record(self):
-        """
-        Populates the generation record with metadata.
-
-        Args:
-        """
-        self.generation_record.gen_data_file_path = self.config["gen_data_file_path"]
-        self.generation_record.filename = f"{self.save_timestamp}.png"
-        self.generation_record.timestamp = self.save_timestamp
-        self.generation_record.model = self.config["model"]
-        self.generation_record.device = self.device
-        self.generation_record.dtype = self.config["dtype"]
-        self.complete_generation_record_impl()
+        pass
 
 
     @abstractmethod
-    def complete_generation_record_impl(self):
+    def teardown(self):
         """
-        Abstract hook for subclasses to add model-specific statistics to the record.
+        Deletes the pipeline, empties the torch cache, and forces Python's garbage collector to run. Clears the slate to create
+        another pipeline.
         """
-        pass
-
-
-    def save_gen_stats(self):
-        """
-        Saves metadata to the record file.
-        """
-        self.complete_generation_record(prompt, i)
-        self.generation_record.save_data()
-
