@@ -1,58 +1,73 @@
 import time
 import datetime 
-from speechjenerator.models.registry import register_model
 
-from speechjenerator.core.base_class import BaseClass
+from gtts import gTTS
+
+from basejenerator.generator_output import GeneratorOutput
+
+from speechjenerator.artifacts.gtts_artifact import GTTSArtifact
+from speechjenerator.registry import register_model
+from speechjenerator.core.base_speech_generator import BaseSpeechGenerator
 
 
-@register_model("model_name")
-class ModelClass(BaseClass):
+@register_model("gtts")
+class GTTS(BaseSpeechGenerator):
     """
-    Concrete implementation of BaseClass for <model name>.
+    Concrete implementation of BaseClass for gTTS.
 
     """
 
     def __init__(self, config):
         """
-        Initializes the <model name> generator.
+        Initializes the gTTS generator.
 
         Args:
             config (dict): Configuration dictionary. Must include standard BaseClass
                            keys plus model-specific keys.
         """
         super().__init__(config)
-        self.pipe = None
 
 
-    def create_pipeline(self):
+    def load(self):
         """
-        Loads the pipeline and applies configurations.
-
-        Steps taken:
-        1. Loads the pipeline using <class>
-        2. 
-
-        Raises:
-            KeyError: If specific config keys (like 'model_path') are missing.
-        """
-        self.pipe = ModelClass.model_method(
-            self.config["model_path"],
-            torch_dtype=self.dtype,
-        ).to(self.device)
-
-
-    def run_pipeline_impl(self):
-        """
-        Executes the inference.
-        """
-        self.output = self.pipe(
-            ...
-        )
-
-
-    def complete_generation_record_impl(self):
-        """
-        Implementation hook for recording extra stats.
+        No-op - gTTS uses a remote API (Google Translate).
         """
         pass
 
+
+    def prepare(self):
+        """
+        No-op - gTTS uses a remote API (Google Translate).
+        """
+        pass
+
+
+    def generate_impl(self, text=None, lang=None):
+        """
+        """
+        if not text:
+            text = self.config["text"]
+
+        if not lang:
+            lang = self.config["lang"]
+
+        gtts_obj = gTTS(text=text, lang=lang)
+
+        artifacts = self._quick_wrap([gtts_obj], [{}], GTTSArtifact)
+        print(artifacts)
+        return GeneratorOutput(artifacts)
+
+
+    def teardown(self):
+        """
+        No-op - gTTS uses a remote API (Google Translate).
+        """
+        pass
+
+
+    def get_params_schema(self):
+        class ParamsSchema(BaseModel):
+            text: str = ""
+            lang: str = ""
+
+        return ParamsSchema
