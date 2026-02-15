@@ -54,7 +54,7 @@ class GTTS(BaseSpeechGenerator):
         gtts_obj = gTTS(text=text, lang=lang)
 
         artifacts = self._quick_wrap([gtts_obj], [{}], GTTSArtifact)
-        print(artifacts)
+
         return GeneratorOutput(artifacts)
 
 
