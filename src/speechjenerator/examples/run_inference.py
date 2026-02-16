@@ -1,17 +1,17 @@
-from speechjenerator.models import registry
+from speechjenerator import registry
 
+output_path = "./outputs/test.wav"
 config = {
-    # model
-    "model": "",
-    "model_path": "",
-    # hardware/system
+    "model": "gtts",
 
-    # model parama
+    "text": "Hazlo o no lo hagas. Intentar no existe.",
+    "lang": "es"
+
 }
-
-
 
 speech_generator = registry.get_model_class(config)
 speech_generator.load()
-output = text_generator.generate()
-response = output.batch[0].data
+print(speech_generator.config)
+output = speech_generator.generate()
+speech = output.batch[0]
+speech.play(output_path)
