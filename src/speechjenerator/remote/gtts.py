@@ -42,6 +42,13 @@ class GTTS(BaseSpeechGenerator):
         pass
 
 
+    def warmup(self):
+        """
+        No-op - gTTS uses a remote API (Google Translate).
+        """
+        pass
+
+
     def generate_impl(self, text=None, lang=None):
         """
         """
