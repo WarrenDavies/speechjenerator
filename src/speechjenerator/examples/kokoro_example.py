@@ -5,12 +5,9 @@ import datetime
 output_path = "./outputs/"
 config = {
     "model": "kokoro",
-
-    "text": """Hazlo o no lo hagas.
-    Intentar no existe.""",
-    "lang": "es",
-    "voice": "ef_dora",
-
+    "text": """Do, or do not. There is no try.""",
+    "lang": "a",
+    "voice": "af_heart",
 }
 
 

@@ -67,6 +67,14 @@ class BaseSpeechGenerator(BaseGenerator):
         pass
 
 
+    @abstractmethod
+    def warmup(self):
+        """
+        Initial inference run to create cache etc., mainly for benchmarking.
+        """
+        pass
+
+
     def generate(self):
         """
         The public API that runs inference.
