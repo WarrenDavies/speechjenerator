@@ -5,7 +5,7 @@ import datetime
 output_path = "./outputs/"
 config = {
     "model": "kokoro",
-    "text": """Do, or do not. There is no try.""",
+    "text": """This audio snip was generated with Kokoro!""",
     "lang": "a",
     "voice": "af_heart",
 }
