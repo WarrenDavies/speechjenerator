@@ -20,7 +20,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-basejenerator = {path = "../base-jenerator", develop = true}
+basejenerator = "^0.2.0"
 gtts = "^2.5.4"
 sounddevice = "^0.5.5"
 soundfile = "^0.13.1"
